@@ -88,7 +88,7 @@ function! repl#start(name, opts)
       echoerr "REPL ".a:name." is not running. Please provide a command."
     endif
     let g:repl_commands[a:name] = a:opts.cmd
-    let g:repl_job[a:name] = s:start_job(a:name)
+    let g:repl_jobs[a:name] = s:start_job(a:name)
   endif
   if !s:operator_exists(a:name)
     call s:make_operator(a:name)
