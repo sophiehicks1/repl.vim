@@ -2,7 +2,7 @@
 
 `repl.vim` is a utility plugin for easily creating repl plugins in vim. It provides 4 functions:
 
-*`repl#start(name, opts)`*
+***`repl#start(name, opts)`***
 
 This starts a background job running `a:opts.cmd`, with the output routed to a `nomodify` buffer
 (created using [`show.vim`](https://github.com/simonhicks/show.vim)). It also creates two
@@ -35,15 +35,15 @@ call repl#start('r', {})
 One option is to wrap this in a function that starts the repl, and then sets up an autocommand to
 automatically connect all other relevent buffers to the same repl.
 
-*`repl#restart(name)`*
+***`repl#restart(name)`***
 
 Self explanatory. This kills the background repl job and restarts it as a new job.
 
-*`repl#status(name)`*
+***`repl#status(name)`***
 
 This returns the job status (`run` for a running job, `dead` for a finished/cancelled job, and `NA`
 if the job doesn't exist at all).
 
-*`repl#kill(name)`*
+***`repl#kill(name)`***
 
 This kills the job.
