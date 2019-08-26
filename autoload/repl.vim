@@ -37,7 +37,7 @@ endfunction
 
 function! repl#restart(name)
   call repl#kill(a:name)
-  call repl#start(a:name)
+  call repl#start(a:name, {})
 endfunction
 
 function! repl#status(name)
@@ -72,7 +72,6 @@ function! s:operator(name, type)
 	    silent exe "normal! `[v`]y"
     endif
     let lines = split(@@, "\n")
-    echom string(lines)
     call s:send(a:name, lines)
   finally
 	  let &selection = sel_save
@@ -130,6 +129,10 @@ function! s:bind_linewise(name, opts)
   if l:binding !=# ''
     execute "nnoremap <buffer> <silent> " . l:binding . " :call " . s:operator_name(a:name) . "(v:count1)<CR>"
   endif
+endfunction
+
+function! repl#clear(name)
+  call show#show(s:buffer_name(a:name), [])
 endfunction
 
 function! repl#start(name, opts)

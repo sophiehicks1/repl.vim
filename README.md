@@ -1,6 +1,7 @@
 # `repl.vim`
 
-`repl.vim` is a utility plugin for easily creating repl plugins in vim. It provides 4 functions:
+`repl.vim` is a utility plugin for easily creating repl plugins in vim. It provides a handful of
+functions.
 
 ***`repl#start(name, opts)`***
 
@@ -50,7 +51,7 @@ function! s:rconnect()
   autocmd! BufNewFile *.R call repl#start('r', {})
 endfunction
 
-command! Connect call <SID>rconnect()
+command! -buffer Connect call <SID>rconnect()
 ```
 
 ***`repl#restart(name)`***
@@ -65,3 +66,26 @@ if the job doesn't exist at all).
 ***`repl#kill(name)`***
 
 This kills the job.
+
+***`repl#clear(name)`***
+
+This clears the output buffer, but leaves the repl running in the background.
+
+## Example usage:
+
+As you can probably guess, I wrote this to use with R. Here's my `ftplugin/r.vim` to show you how I
+use it:
+
+```{.vim}
+function! s:rconnect()
+  call repl#start('r', {
+        \ 'opbind': 'cp',
+        \ 'linebind': 'cpp',
+        \ 'cmd': 'R --no-save --no-readline --interactive'})
+  autocmd! BufNewFile *.R call repl#start('r', {})
+endfunction
+
+command! -buffer Connect call <SID>rconnect()
+command! -buffer Clear call repl#clear('r')
+command! -buffer Restart call repl#restart('r')
+```
