@@ -12,7 +12,6 @@ if !exists("g:repl_jobs")
 endif
 
 function! s:start_job(name)
-  echom "starting job using term_start"
   return term_start(g:repl_commands[a:name])
 endfunction
 
@@ -124,13 +123,8 @@ function! s:bind_linewise(name, opts)
 endfunction
 
 function! repl#start(name, opts)
-  echom "starting"
   call s:run_command(a:name, a:opts)
-  echom "command started"
   call s:create_operator(a:name)
-  echom "created operator function"
   call s:bind_operator(a:name, a:opts)
-  echom "bound operator"
   call s:bind_linewise(a:name, a:opts)
-  echom "bound linewise"
 endfunction
