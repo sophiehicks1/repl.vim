@@ -5,10 +5,8 @@ functions.
 
 ***`repl#start(name, opts)`***
 
-This starts a background job running `a:opts.cmd`, with the output routed to a `nomodify` buffer
-(created using [`show.vim`](https://github.com/simonhicks/show.vim)). It also creates some
-buffer-local bindings (bound to the `a:opts.binding` argument) for sending text/commands/code/whatever to
-that job.
+This starts a terminal running `a:opts.cmd` and creates some buffer-local bindings (bound to the
+`a:opts.binding` argument) for sending text/commands/code/whatever to that job.
 
 That's pretty abstract, so here's an example. If you run the following in an `R` buffer:
 
@@ -16,7 +14,8 @@ That's pretty abstract, so here's an example. If you run the following in an `R`
 call repl#start('r', {
       \ 'opbind': 'cp',
       \ 'linebind': 'cpp',
-      \ 'cmd': 'R --no-save --no-readline --interactive'})
+      \ 'cmd': 'R --no-save --no-readline --interactive',
+      \ 'quit': 'q()'})
 ```
 
 ... it will start an interactive R session in the background, and open a buffer `__r__` for the
@@ -47,29 +46,28 @@ function! s:rconnect()
   call repl#start('r', {
         \ 'opbind': 'cp',
         \ 'linebind': 'cpp',
-        \ 'cmd': 'R --no-save --no-readline --interactive'})
+        \ 'cmd': 'R --no-save --no-readline --interactive'
+        \ 'quit': 'q()'})
   autocmd! BufNewFile *.R call repl#start('r', {})
 endfunction
 
 command! -buffer Connect call <SID>rconnect()
 ```
 
+***`repl#send(name, msg_lines)`***
+
+Send `a:msg_lines` to the named repl, using `term_sendkeys`. `a:msg_lines` should be a list of
+strings that will be interpretted using vimscript keybinding syntax (e.g. `'\<C-c>'` means sending
+Ctrl-c). Carriage returns will automatically be appended.
+
+***`repl#kill(name)`***
+
+This kills the job by sending the `'quit'` option to the terminal.
+
 ***`repl#restart(name)`***
 
 Self explanatory. This kills the background repl job and restarts it as a new job.
 
-***`repl#status(name)`***
-
-This returns the job status (`run` for a running job, `dead` for a finished/cancelled job, and `NA`
-if the job doesn't exist at all).
-
-***`repl#kill(name)`***
-
-This kills the job.
-
-***`repl#clear(name)`***
-
-This clears the output buffer, but leaves the repl running in the background.
 
 ## Example usage:
 
@@ -81,11 +79,19 @@ function! s:rconnect()
   call repl#start('r', {
         \ 'opbind': 'cp',
         \ 'linebind': 'cpp',
+        \ 'quit': 'q()',
         \ 'cmd': 'R --no-save --no-readline --interactive'})
   autocmd! BufNewFile *.R call repl#start('r', {})
 endfunction
 
 command! -buffer Connect call <SID>rconnect()
-command! -buffer Clear call repl#clear('r')
 command! -buffer Restart call repl#restart('r')
 ```
+
+All the options are optional, although obviously if you don't set `cmd` at least the first time it
+won't know what command to run.
+
+## Dependencies
+
+This only works if you've compiled vim with the `terminal` option. You can check for this by running
+`:version` and looking for `+terminal`.

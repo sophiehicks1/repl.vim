@@ -8,20 +8,17 @@ if !exists("g:repl_jobs")
   let g:repl_commands = {}
   let g:repl_opbinds = {}
   let g:repl_linebinds = {}
+  let g:repl_quit_seqs = {}
 endif
 
 function! s:start_job(name)
-  return term_start(g:repl_commands[a:name], opts)
+  echom "starting job using term_start"
+  return term_start(g:repl_commands[a:name])
 endfunction
 
 function! repl#kill(name)
   call term_sendkeys(g:repl_jobs[a:name], g:repl_quit_seqs[a:name])
   call remove(g:repl_jobs, a:name)
-endfunction
-
-function! repl#restart(name)
-  call repl#kill(a:name)
-  call repl#start(a:name, {})
 endfunction
 
 function! s:is_running(name)
@@ -33,8 +30,16 @@ function! s:is_running(name)
   endif
 endfunction
 
-function! s:send(name, msg_lines)
-  call term_sendkeys(g:repl_jobs[a:name], join(a:msg_lines, "\<cr>")."\<cr>")
+function! repl#send(name, msg_lines)
+  for l:line in a:msg_lines
+    call term_sendkeys(g:repl_jobs[a:name], l:line . "\<cr>")
+    redraw!
+  endfor
+endfunction
+
+function! repl#restart(name)
+  call repl#kill(a:name)
+  call repl#start(a:name, {})
 endfunction
 
 function! s:operator_exists(name)
@@ -56,7 +61,7 @@ function! s:operator(name, type)
 	    silent exe "normal! `[v`]y"
     endif
     let lines = split(@@, "\n")
-    call s:send(a:name, lines)
+    call repl#send(a:name, lines)
   finally
 	  let &selection = sel_save
 	  let @@ = reg_save
@@ -73,9 +78,12 @@ function! s:make_operator(name)
 endfunction
 
 function! s:run_command(name, opts)
-  if s:is_running(a:name)
+  if !s:is_running(a:name)
     if a:opts.cmd ==# ''
       echoerr "REPL ".a:name." is not running. Please provide a command."
+    endif
+    if has_key(a:opts, 'quit')
+      let g:repl_quit_seqs[a:name] = a:opts['quit']
     endif
     let g:repl_commands[a:name] = a:opts.cmd
     let g:repl_jobs[a:name] = s:start_job(a:name)
@@ -90,7 +98,7 @@ endfunction
 
 function! s:bind_operator(name, opts)
   let l:opbind = ''
-  if a:opts.opbind !=# ''
+  if has_key (a:opts, 'opbind') && a:opts.opbind !=# ''
     let l:opbind = a:opts.opbind
     let g:repl_opbinds[a:name] = a:opts.opbind
   elseif has_key(g:repl_opbinds, a:name)
@@ -104,7 +112,7 @@ endfunction
 
 function! s:bind_linewise(name, opts)
   let l:binding = ''
-  if a:opts.linebind !=# ''
+  if has_key(a:opts, 'linebind') && a:opts.linebind !=# ''
     let l:binding = a:opts.linebind
     let g:repl_linebinds[a:name] = a:opts.linebind
   elseif has_key(g:repl_linebinds, a:name)
@@ -115,14 +123,14 @@ function! s:bind_linewise(name, opts)
   endif
 endfunction
 
-function! repl#clear(name)
-  call show#show(s:buffer_name(a:name), [])
-endfunction
-
 function! repl#start(name, opts)
-  let g:repl_quit_seqs[a:name] = a:opts.quit
+  echom "starting"
   call s:run_command(a:name, a:opts)
+  echom "command started"
   call s:create_operator(a:name)
+  echom "created operator function"
   call s:bind_operator(a:name, a:opts)
+  echom "bound operator"
   call s:bind_linewise(a:name, a:opts)
+  echom "bound linewise"
 endfunction
