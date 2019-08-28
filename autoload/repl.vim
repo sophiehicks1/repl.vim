@@ -10,28 +10,12 @@ if !exists("g:repl_jobs")
   let g:repl_linebinds = {}
 endif
 
-function! repl#handler(channel, msg)
-  let buffer_name = '__REPL__'
-  for l:name in keys(g:repl_jobs)
-    if job_getchannel(g:repl_jobs[l:name]) ==# a:channel
-      let buffer_name = s:buffer_name(l:name)
-    endif
-  endfor
-  call show#append(buffer_name, [a:msg])
-endfunction
-
-function! s:buffer_name(name)
-  return "__".a:name."__"
-endfunction
-
 function! s:start_job(name)
-  let opts = {"callback": "repl#handler", 'mode': 'nl'}
-  call show#show(s:buffer_name(a:name), [])
-  return job_start(g:repl_commands[a:name], opts)
+  return term_start(g:repl_commands[a:name], opts)
 endfunction
 
 function! repl#kill(name)
-  call job_stop(g:repl_jobs[a:name])
+  call term_sendkeys(g:repl_jobs[a:name], g:repl_quit_seqs[a:name])
   call remove(g:repl_jobs, a:name)
 endfunction
 
@@ -40,17 +24,17 @@ function! repl#restart(name)
   call repl#start(a:name, {})
 endfunction
 
-function! repl#status(name)
+function! s:is_running(name)
   if has_key(g:repl_jobs, a:name)
-    return job_status(g:repl_jobs[a:name])
+    let status = term_getstatus(g:repl_jobs[a:name])
+    return status ==# "running" || status ==# "normal"
   else
-    return "NA"
+    return v:false
   endif
 endfunction
 
 function! s:send(name, msg_lines)
-  let channel = job_getchannel(g:repl_jobs[a:name])
-  call ch_sendraw(channel, join(a:msg_lines, "\n")."\n") " FIXME joining with ; and appending \n works, but that isn't generic
+  call term_sendkeys(g:repl_jobs[a:name], join(a:msg_lines, "\<cr>")."\<cr>")
 endfunction
 
 function! s:operator_exists(name)
@@ -89,7 +73,7 @@ function! s:make_operator(name)
 endfunction
 
 function! s:run_command(name, opts)
-  if repl#status(a:name) !=# 'run'
+  if s:is_running(a:name)
     if a:opts.cmd ==# ''
       echoerr "REPL ".a:name." is not running. Please provide a command."
     endif
@@ -136,6 +120,7 @@ function! repl#clear(name)
 endfunction
 
 function! repl#start(name, opts)
+  let g:repl_quit_seqs[a:name] = a:opts.quit
   call s:run_command(a:name, a:opts)
   call s:create_operator(a:name)
   call s:bind_operator(a:name, a:opts)
