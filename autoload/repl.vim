@@ -97,7 +97,7 @@ endfunction
 
 function! s:bind_operator(name, opts)
   let l:opbind = ''
-  if has_key (a:opts, 'opbind') && a:opts.opbind !=# ''
+  if has_key(a:opts, 'opbind') && a:opts.opbind !=# ''
     let l:opbind = a:opts.opbind
     let g:repl_opbinds[a:name] = a:opts.opbind
   elseif has_key(g:repl_opbinds, a:name)
@@ -123,8 +123,8 @@ function! s:bind_linewise(name, opts)
 endfunction
 
 function! repl#start(name, opts)
-  call s:run_command(a:name, a:opts)
   call s:create_operator(a:name)
   call s:bind_operator(a:name, a:opts)
   call s:bind_linewise(a:name, a:opts)
+  call s:run_command(a:name, a:opts)
 endfunction
