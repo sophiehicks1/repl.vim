@@ -16,7 +16,11 @@ function! s:start_job(name)
 endfunction
 
 function! repl#kill(name)
-  call term_sendkeys(g:repl_jobs[a:name], g:repl_quit_seqs[a:name])
+  if has_key(g:repl_quit_seqs, a:name) && g:repl_quit_seqs[a:name] != ''
+    call term_sendkeys(g:repl_jobs[a:name], g:repl_quit_seqs[a:name])
+  else
+    call term_sendkeys(g:repl_jobs[a:name], '<C-w><C-c>')
+  endif
   call remove(g:repl_jobs, a:name)
 endfunction
 
