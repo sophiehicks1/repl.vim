@@ -5,6 +5,7 @@ let g:repl_vim_autoloaded = 1
 
 if !exists("g:repl_jobs")
   let g:repl_jobs = {}
+  let g:repl_buffers = {}
   let g:repl_commands = {}
   let g:repl_opbinds = {}
   let g:repl_linebinds = {}
@@ -19,7 +20,7 @@ function! repl#kill(name)
   if has_key(g:repl_quit_seqs, a:name) && g:repl_quit_seqs[a:name] != ''
     call term_sendkeys(g:repl_jobs[a:name], g:repl_quit_seqs[a:name])
   else
-    call term_sendkeys(g:repl_jobs[a:name], '<C-w><C-c>')
+    exec "bw! ".g:repl_buffers[a:name]
   endif
   call remove(g:repl_jobs, a:name)
 endfunction
@@ -90,6 +91,7 @@ function! s:run_command(name, opts)
     endif
     let g:repl_commands[a:name] = a:opts.cmd
     let g:repl_jobs[a:name] = s:start_job(a:name)
+    let g:repl_buffers[a:name] = bufnr('%')
   endif
 endfunction
 
