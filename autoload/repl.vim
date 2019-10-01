@@ -25,7 +25,7 @@ function! repl#kill(name)
   call remove(g:repl_jobs, a:name)
 endfunction
 
-function! s:is_running(name)
+function! repl#is_running(name)
   if has_key(g:repl_jobs, a:name)
     let status = term_getstatus(g:repl_jobs[a:name])
     return status ==# "running" || status ==# "normal"
@@ -82,7 +82,7 @@ function! s:make_operator(name)
 endfunction
 
 function! s:run_command(name, opts)
-  if !s:is_running(a:name)
+  if !repl#is_running(a:name)
     if a:opts.cmd ==# ''
       echoerr "REPL ".a:name." is not running. Please provide a command."
     endif
