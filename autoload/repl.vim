@@ -128,9 +128,14 @@ function! s:bind_linewise(name, opts)
   endif
 endfunction
 
+function! s:return_to_previous_window()
+  execute "normal! p"
+endfunction
+
 function! repl#start(name, opts)
   call s:create_operator(a:name)
   call s:bind_operator(a:name, a:opts)
   call s:bind_linewise(a:name, a:opts)
   call s:run_command(a:name, a:opts)
+  call s:return_to_previous_window()
 endfunction
