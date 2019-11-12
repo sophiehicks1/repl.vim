@@ -133,9 +133,12 @@ function! s:return_to_previous_window()
 endfunction
 
 function! repl#start(name, opts)
+  let l:buffer = buffer_number('.')
   call s:create_operator(a:name)
   call s:bind_operator(a:name, a:opts)
   call s:bind_linewise(a:name, a:opts)
   call s:run_command(a:name, a:opts)
-  call s:return_to_previous_window()
+  if l:buffer != buffer_number('.')
+    call s:return_to_previous_window()
+  endif
 endfunction
