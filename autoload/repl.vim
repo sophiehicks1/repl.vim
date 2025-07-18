@@ -169,7 +169,7 @@ endfunction
 
 function! repl#send(name, msg_lines)
   for l:line in a:msg_lines
-    call s:send_to_job(a:name], l:line . "\<cr>")
+    call s:send_to_job(a:name, l:line . "\<cr>")
     redraw!
   endfor
 endfunction
