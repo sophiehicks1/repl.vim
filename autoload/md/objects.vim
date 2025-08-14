@@ -1,10 +1,10 @@
-if exists("g:markdown_vim_autoloaded")
+if exists("g:md_objects_vim_autoloaded")
   finish
 endif
-let g:markdown_vim_autoloaded = 1
+let g:md_objects_vim_autoloaded = 1
 
 " Helper function to find the start and end of a markdown link (public for testing)
-function! markdown#find_link_bounds()
+function! md#objects#find_link_bounds()
   let save_cursor = getpos('.')
   let current_line = line('.')
   let current_col = col('.')
@@ -181,8 +181,8 @@ function! markdown#find_link_bounds()
 endfunction
 
 " Text object for link text (inside [...])
-function! markdown#link_text_textobj(type)
-  let bounds = markdown#find_link_bounds()
+function! md#objects#link_text_textobj(type)
+  let bounds = md#objects#find_link_bounds()
   if empty(bounds)
     return
   endif
@@ -205,8 +205,8 @@ function! markdown#link_text_textobj(type)
 endfunction
 
 " Text object for link URL (inside (...) or reference)
-function! markdown#link_url_textobj(type)
-  let bounds = markdown#find_link_bounds()
+function! md#objects#link_url_textobj(type)
+  let bounds = md#objects#find_link_bounds()
   if empty(bounds)
     return
   endif
@@ -247,8 +247,8 @@ function! markdown#link_url_textobj(type)
 endfunction
 
 " Text object for the inline portion of the link
-function! markdown#link_inline_textobj(type)
-  let bounds = markdown#find_link_bounds()
+function! md#objects#link_inline_textobj(type)
+  let bounds = md#objects#find_link_bounds()
   if empty(bounds)
     return
   endif
@@ -265,22 +265,22 @@ function! markdown#link_inline_textobj(type)
 endfunction
 
 " Set up the text object mappings
-function! markdown#setup_textobjects()
+function! md#objects#setup_textobjects()
   " Map for link text
-  onoremap <buffer> <silent> ilt :<C-u>call markdown#link_text_textobj('i')<CR>
-  onoremap <buffer> <silent> alt :<C-u>call markdown#link_text_textobj('a')<CR>
-  vnoremap <buffer> <silent> ilt :<C-u>call markdown#link_text_textobj('i')<CR>
-  vnoremap <buffer> <silent> alt :<C-u>call markdown#link_text_textobj('a')<CR>
+  onoremap <buffer> <silent> ilt :<C-u>call md#objects#link_text_textobj('i')<CR>
+  onoremap <buffer> <silent> alt :<C-u>call md#objects#link_text_textobj('a')<CR>
+  vnoremap <buffer> <silent> ilt :<C-u>call md#objects#link_text_textobj('i')<CR>
+  vnoremap <buffer> <silent> alt :<C-u>call md#objects#link_text_textobj('a')<CR>
   
   " Map for link URL
-  onoremap <buffer> <silent> ilu :<C-u>call markdown#link_url_textobj('i')<CR>
-  onoremap <buffer> <silent> alu :<C-u>call markdown#link_url_textobj('a')<CR>
-  vnoremap <buffer> <silent> ilu :<C-u>call markdown#link_url_textobj('i')<CR>
-  vnoremap <buffer> <silent> alu :<C-u>call markdown#link_url_textobj('a')<CR>
+  onoremap <buffer> <silent> ilu :<C-u>call md#objects#link_url_textobj('i')<CR>
+  onoremap <buffer> <silent> alu :<C-u>call md#objects#link_url_textobj('a')<CR>
+  vnoremap <buffer> <silent> ilu :<C-u>call md#objects#link_url_textobj('i')<CR>
+  vnoremap <buffer> <silent> alu :<C-u>call md#objects#link_url_textobj('a')<CR>
   
   " Map for inline portion
-  onoremap <buffer> <silent> ill :<C-u>call markdown#link_inline_textobj('i')<CR>
-  onoremap <buffer> <silent> all :<C-u>call markdown#link_inline_textobj('a')<CR>
-  vnoremap <buffer> <silent> ill :<C-u>call markdown#link_inline_textobj('i')<CR>
-  vnoremap <buffer> <silent> all :<C-u>call markdown#link_inline_textobj('a')<CR>
+  onoremap <buffer> <silent> ill :<C-u>call md#objects#link_inline_textobj('i')<CR>
+  onoremap <buffer> <silent> all :<C-u>call md#objects#link_inline_textobj('a')<CR>
+  vnoremap <buffer> <silent> ill :<C-u>call md#objects#link_inline_textobj('i')<CR>
+  vnoremap <buffer> <silent> all :<C-u>call md#objects#link_inline_textobj('a')<CR>
 endfunction

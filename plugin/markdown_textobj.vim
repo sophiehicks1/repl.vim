@@ -9,5 +9,5 @@ let g:loaded_markdown_textobj = 1
 " Auto-setup for markdown files
 augroup MarkdownTextObjects
   autocmd!
-  autocmd FileType markdown call markdown#setup_textobjects()
+  autocmd FileType markdown call md#objects#setup_textobjects()
 augroup END
